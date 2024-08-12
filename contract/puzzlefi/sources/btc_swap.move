@@ -69,6 +69,7 @@ module puzzlefi::btc_swap {
         last_update_time: u64,
         /// Is order lock
         is_lock: bool,
+        lock_addr: address,
         /// Is pending cancel
         is_pending_cancel: bool,
         /// is bid order or listing order, now no bid
@@ -185,6 +186,7 @@ module puzzlefi::btc_swap {
             quantity,
             owner: sender(),
             is_lock: false,
+            lock_addr: @0x0,
             last_update_time: now_seconds(),
             is_bid: false,
             is_pending_cancel: false
@@ -239,7 +241,7 @@ module puzzlefi::btc_swap {
             order_id,
             sender()
         );
-        assert!(!order.is_lock, ErrorOrderIsLock);
+        assert!(!check_order_is_lock(&order), ErrorOrderIsLock);
         account_coin_store::deposit(sender(), coin_store::withdraw(&mut market.base_asset, order.quantity))
     }
 
@@ -260,9 +262,10 @@ module puzzlefi::btc_swap {
         };
         assert!(tick_exists, ErrorInvalidOrderId);
         let order = borrow_mut_order(&mut market.asks, tick_index, order_id);
-        assert!(!order.is_lock, ErrorOrderIsLock);
+        assert!(!check_order_is_lock(order), ErrorOrderIsLock);
         assert!(!order.is_pending_cancel, ErrorOrderIsPendingCancel);
         order.is_lock = true;
+        order.lock_addr = sender();
         order.last_update_time = now_seconds()
     }
     ///purchase
@@ -284,10 +287,10 @@ module puzzlefi::btc_swap {
         };
         assert!(tick_exists, ErrorInvalidOrderId);
         let order = remove_order(&mut market.asks, usr_open_orders, tick_index, order_id, sender());
-        assert!(!order.is_lock, ErrorOrderIsLock);
+        assert!(!check_order_is_lock(&order), ErrorOrderIsLock);
         let total_price = order.quantity * (order.unit_price as u256);
         let transaction = option::destroy_some(bitcoin::get_tx(txid));
-        asset_transaction_sender(&transaction, sender());
+        asset_transaction_sender(&transaction, order.lock_addr);
         let amount = effective_transaction_amount(&transaction, order.owner);
         table_vec::push_back(&mut market.confirm_tx, transaction);
         assert!((amount as u256) >= total_price, ErrorInputCoin);
@@ -625,5 +628,9 @@ module puzzlefi::btc_swap {
             i = i + 1;
         };
         result
+    }
+
+    public fun check_order_is_lock(order: &Order): bool {
+        order.is_lock && (order.last_update_time + 43200 > now_seconds())
     }
 }

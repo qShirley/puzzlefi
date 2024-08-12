@@ -27,6 +27,18 @@ module puzzlefi::puzzlefi_coin {
         })
     }
 
+    public entry fun register_extend<CoinType: key+store>(){
+        let coin_info_obj = coin::register_extend<PFC<CoinType>>(
+            string::utf8(b"PuzzleFi Coin"),
+            string::utf8(b"PFC"),
+            decimals(),
+        );
+        let module_signer = module_signer<NativeCoinInfo<CoinType>>();
+        move_resource_to(&module_signer, NativeCoinInfo<CoinType>{
+            coin_info_obj
+        })
+    }
+
     public(friend) fun borrow_coin_info<CoinType: key+store>(): &CoinInfo<PFC<CoinType>>{
         let module_signer = module_signer<PFC<CoinType>>();
         object::borrow(&borrow_resource<NativeCoinInfo<CoinType>>(address_of(&module_signer)).coin_info_obj)

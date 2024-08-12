@@ -22,7 +22,7 @@ import {enqueueSnackbar} from "notistack";
 import React, {useState} from "react";
 import "./App.css";
 import {shortAddress} from "./utils";
-import {contractAddress, puzzleGameModule, roochGasCoinType} from "./constants.ts";
+import {contractAddress, puzzlefiCoinModule, puzzleGameModule, roochGasCoinType} from "./constants.ts";
 import {getIcon, getWinner} from "./hooks/utils.tsx";
 import ButtonGroup from "@mui/material/ButtonGroup";
 import ButtonGroup2, {ButtonGroup3} from "./components/ButtonGroup.tsx";
@@ -83,7 +83,7 @@ function App() {
     const {data: coins, refetch: coinsFetch} = useRoochClientQuery("executeViewFunction", {
         target: `0x3::account_coin_store::balance`,
         args: [Args.address(currentAddress?.genRoochAddress().toStr() || "")],
-        typeArgs: ["0x900f053234b0ba66ad062b277896b28e049f2813d388da375efcd54b6e429dbe::puzzlefi_coin::PFC<0x3::gas_coin::GasCoin>"]
+        typeArgs: [`${contractAddress}::${puzzlefiCoinModule}::PFC<${roochGasCoinType}>`]
     })
 
     const {data: BalanceResult, refetch} = useRoochClientQuery("getBalance", {
@@ -284,7 +284,7 @@ function App() {
                     <Stack>
                         <Typography fontSize={"small"} textAlign={"left"}>
                             <PaidIcon></PaidIcon>
-                            当前池子中PFC数量：
+                            当前流通的PFC数量：
                             <CountUp
                                 style={{
                                     fontVariantNumeric: "tabular-nums lining-nums",
