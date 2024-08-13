@@ -26,7 +26,7 @@ Puzzlefi是基于rooch的全链博弈游戏平台, 独创的游戏收益分发�
 ## 功能与模块
 
 **Puzzlefi 一共有三个模块**
-- ```btc_swap```模块提供提供订单簿市场让用户在rooch挂单通过btc支付交易
+- ```btc_swap```模块提供订单簿市场让用户在rooch挂单通过btc支付交易
 - ```puzzle_game```模块提供stake与redeem功能将游戏创作者发行的代币转化为PFC范型代币，转化博弈主体
 - ```puzzle_coin```模块提供铸造和销毁PFC范型代币的功能，只有puzzle_game模块可以调用
 ### ```btc_swap```

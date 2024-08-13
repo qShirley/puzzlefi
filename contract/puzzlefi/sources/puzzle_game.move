@@ -154,7 +154,7 @@ module puzzlefi::puzzle_game {
         bet_amount: u256,
     ){
         settlement_finger_game<CoinType>();
-        assert!(player_guessing <= 29, ErrorGuessingNumber);
+        assert!(player_guessing <= 9, ErrorGuessingNumber);
         let module_signer = module_signer<Global<CoinType>>();
         let global = borrow_mut_resource<Global<CoinType>>(address_of(&module_signer));
         assert!(global.is_open, ErrorNotOpen);
@@ -183,7 +183,6 @@ module puzzlefi::puzzle_game {
             coin_store::deposit(&mut new_game.coin, protocol_coin);
             table::add(&mut global.finger_game_record, global.current_round, new_game);
             global.last_update_timestamp = now_milliseconds()
-        }else {
         }
     }
 
